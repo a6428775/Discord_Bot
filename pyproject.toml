@@ -13,6 +13,7 @@ selenium = "^4.8.0"
 webdriver-manager = "^3.8.5"
 bs4 = "^0.0.1"
 discord = "^2.1.0"
+Flask = "^2.2.2"
 
 [tool.poetry.dev-dependencies]
 
