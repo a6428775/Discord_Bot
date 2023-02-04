@@ -1,0 +1,6 @@
+discord
+selenium
+datetime
+bs4
+lxml
+webdriver-manager
