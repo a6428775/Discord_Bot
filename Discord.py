@@ -68,11 +68,18 @@ if __name__ == "__main__":
   async def main():
     async with bot:
       await load_ext()
-      await bot.start(jdata["TOKEN"])
+      await bot.start(os.getenv("DCBOT_TOKEN"))
 
 
-keep_alive.keep_alive()
-asyncio.run(main())
+try:
+  keep_alive.keep_alive()
+  asyncio.run(main())
+except:
+  print('機器人掉線了')
+  os.system("kill 1")
+  asyncio.sleep(5)
+  print('換IP成功,機器人重連中')
+  asyncio.run(main())
 
 #原IG登入 已死
 # # 等待按鈕出現
