@@ -74,8 +74,9 @@ class Task(Cog_Extension):
           # await sendpic(self,5)
           try:
             await sc.shopee_coin2(self)
-          except:
+          except Exception as e:
             await self.channel.send('蝦皮簽到功能出錯,請維修')
+            print(e)
           await asyncio.sleep(60)
           self.counter = 0
         else:

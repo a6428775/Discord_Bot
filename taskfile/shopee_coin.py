@@ -1,3 +1,4 @@
+import os
 import discord
 import asyncio
 from discord.ext import commands
@@ -52,28 +53,36 @@ async def shopee_coin2(self):
   await asyncio.sleep(8)
 
   #判斷是否有登入成功 如cookies 登入失敗改用帳密登入並儲存新的cookies
-  login = browser.find_element(By.CLASS_NAME,'pcmall-dailycheckin_3u8jig.pcmall-dailycheckin_3uUmyu.pcmall-dailycheckin_1EAaO5')
+  login = browser.find_element(
+    By.CLASS_NAME,
+    'pcmall-dailycheckin_3u8jig.pcmall-dailycheckin_3uUmyu.pcmall-dailycheckin_1EAaO5'
+  )
   if login.text == '登入以獲得蝦幣':
-      print('cookies 失效')
-      browser.get('https://shopee.tw/buyer/login?next=https%3A%2F%2Fshopee.tw%2Fshopee-coins')
-      await asyncio.sleep(8)
-      #輸入帳號欄位
-      browser.find_element(By.NAME,'loginKey').send_keys(os.getenv("shopee_act"))
-      await asyncio.sleep(3)
-      #輸入密碼欄位
-      browser.find_element(By.NAME,'password').send_keys(os.getenv("shopee_pwd"))
-      await asyncio.sleep(3)
-      #點擊登入按鈕
-      browser.find_element(By.CLASS_NAME,'wyhvVD._1EApiB.hq6WM5.L-VL8Q.cepDQ1._7w24N1').click()
-      await asyncio.sleep(8)
-      my_cookies = browser.get_cookies()
-      with open(
-          os.path.join(os.path.dirname((os.path.dirname(__file__))),
-                      'cookies_shopee.json'),'w') as f:
-        f.write(json.dumps(my_cookies)) 
-      await asyncio.sleep(8)
-      browser.get('https://shopee.tw/shopee-coins')
-      await asyncio.sleep(8)
+    print('cookies 已過期')
+    browser.get(
+      'https://shopee.tw/buyer/login?next=https%3A%2F%2Fshopee.tw%2Fshopee-coins'
+    )
+    await asyncio.sleep(10)
+    #輸入帳號欄位
+    browser.find_element(By.NAME,
+                         'loginKey').send_keys(str(os.getenv("shopee_act")))
+    await asyncio.sleep(3)
+    #輸入密碼欄位
+    browser.find_element(By.NAME,
+                         'password').send_keys(str(os.getenv("shopee_pwd")))
+    await asyncio.sleep(3)
+    #點擊登入按鈕
+    browser.find_element(
+      By.CLASS_NAME, 'wyhvVD._1EApiB.hq6WM5.L-VL8Q.cepDQ1._7w24N1').click()
+    await asyncio.sleep(8)
+    my_cookies = browser.get_cookies()
+    with open(
+        os.path.join(os.path.dirname((os.path.dirname(__file__))),
+                     'cookies_shopee.json'), 'w') as f:
+      f.write(json.dumps(my_cookies))
+    await asyncio.sleep(8)
+    browser.get('https://shopee.tw/shopee-coins')
+    await asyncio.sleep(8)
 
   #解析網頁原始碼
   soup = Soup(browser.page_source, "lxml")
