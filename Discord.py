@@ -80,28 +80,3 @@ except:
   asyncio.sleep(5)
   print('換IP成功,機器人重連中')
   asyncio.run(main())
-
-#原IG登入 已死
-# # 等待按鈕出現
-# WebDriverWait(browser, 20).until(EC.presence_of_element_located((By.CLASS_NAME, '_acan._acap._acas')))
-# # 找到登入按鈕
-# button = browser.find_elements(By.CLASS_NAME,'_acan._acap._acas')[0]
-# # 找到帳號密碼輸入框 # 輸入帳號密碼
-# browser.find_element(By.NAME,'username').send_keys('fktestbot')
-# browser.find_element(By.NAME,'password').send_keys('aabb1111')
-# print("輸入帳密成功")
-
-# # 點擊登入按鈕
-# button.click()
-# print("登入成功")
-
-# time.sleep(3)
-# # 等待稍後再說出現
-# WebDriverWait(browser, 20).until(EC.presence_of_element_located((By.CLASS_NAME, '_acan._acao._acas')))
-# # 找到稍後再說按鈕
-# button1 = browser.find_elements(By.CLASS_NAME,'_acan._acao._acas')[0]
-# # 點擊稍後再說按鈕
-# button1.click()
-# print("關閉稍後再說成功")
-
-# time.sleep(2)

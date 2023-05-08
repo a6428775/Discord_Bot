@@ -39,6 +39,11 @@ async def shopee_coin2(self):
   print("開啟蝦皮簽到網站網址")
   #載入cookie
   for cookie in cookies:
+    #刪除cookies中sameSite部分 不然會報錯
+    try:
+      cookie.pop('sameSite')
+    except:
+      None
     browser.add_cookie(cookie)
   print("載入cookie")
   #重新整理網頁
@@ -46,14 +51,36 @@ async def shopee_coin2(self):
   print("重新整理網頁完成")
   await asyncio.sleep(4)
 
+  #判斷是否有登入成功 如cookies 登入失敗改用帳密登入並儲存新的cookies
+  login = browser.find_element(By.CLASS_NAME,'pcmall-dailycheckin_3u8jig.pcmall-dailycheckin_3uUmyu.pcmall-dailycheckin_1EAaO5')
+  if login.text == '登入以獲得蝦幣':
+      print('cookies 失效')
+      browser.get('https://shopee.tw/buyer/login?next=https%3A%2F%2Fshopee.tw%2Fshopee-coins')
+      await asyncio.sleep(4)
+      #輸入帳號欄位
+      browser.find_element(By.NAME,'loginKey').send_keys(os.getenv("shopee_account"))
+      await asyncio.sleep(1)
+      #輸入密碼欄位
+      browser.find_element(By.NAME,'password').send_keys(os.getenv("shopee_password"))
+      await asyncio.sleep(1)
+      #點擊登入按鈕
+      browser.find_element(By.CLASS_NAME,'wyhvVD._1EApiB.hq6WM5.L-VL8Q.cepDQ1._7w24N1').click()
+      await asyncio.sleep(3)
+      my_cookies = browser.get_cookies()
+      with open(
+          os.path.join(os.path.dirname((os.path.dirname(__file__))),
+                      'cookies_shopee.json'),'w') as f:
+        f.write(json.dumps(my_cookies)) 
+      await asyncio.sleep(3)
+      browser.get('https://shopee.tw/shopee-coins')
+      await asyncio.sleep(3)
+
   #解析網頁原始碼
   soup = Soup(browser.page_source, "lxml")
 
   await asyncio.sleep(4)
   print("解析網頁原始碼完成")
-  #獲得目前蝦幣數量
-  findCoinCount = soup.find_all('a', href="/coins")[0].getText()
-  await self.channel.send('目前蝦幣數量 : ' + findCoinCount)
+
   #獲取網頁所有的按鈕原始碼
   findBtn = soup.find_all('button')
 
@@ -70,7 +97,7 @@ async def shopee_coin2(self):
 
       print("簽到成功")
       break
-    elif '明天再回來領取' in btn.getText():
+    elif '明天再回來' in btn.getText():
       #今天已簽到
       await self.channel.send('今天已簽到過,明天再來')
       print("今天已簽到過,明天再來")
@@ -79,4 +106,8 @@ async def shopee_coin2(self):
       await self.channel.send('找不到簽到按鈕,可能是cookies過期')
       print("找不到簽到按鈕,可能是cookies過期")
       break
+
+  #獲得目前蝦幣數量
+  findCoinCount = soup.find_all('a', href="/coins")[0].getText()
+  await self.channel.send('目前擁有蝦幣數量 : ' + findCoinCount)
   browser.quit()
