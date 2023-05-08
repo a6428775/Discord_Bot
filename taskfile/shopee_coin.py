@@ -49,7 +49,7 @@ async def shopee_coin2(self):
   #重新整理網頁
   browser.refresh()
   print("重新整理網頁完成")
-  await asyncio.sleep(4)
+  await asyncio.sleep(8)
 
   #判斷是否有登入成功 如cookies 登入失敗改用帳密登入並儲存新的cookies
   login = browser.find_element(By.CLASS_NAME,'pcmall-dailycheckin_3u8jig.pcmall-dailycheckin_3uUmyu.pcmall-dailycheckin_1EAaO5')
