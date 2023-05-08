@@ -56,29 +56,29 @@ async def shopee_coin2(self):
   if login.text == '登入以獲得蝦幣':
       print('cookies 失效')
       browser.get('https://shopee.tw/buyer/login?next=https%3A%2F%2Fshopee.tw%2Fshopee-coins')
-      await asyncio.sleep(4)
+      await asyncio.sleep(8)
       #輸入帳號欄位
-      browser.find_element(By.NAME,'loginKey').send_keys(os.getenv("shopee_account"))
-      await asyncio.sleep(1)
+      browser.find_element(By.NAME,'loginKey').send_keys(os.getenv("shopee_act"))
+      await asyncio.sleep(3)
       #輸入密碼欄位
-      browser.find_element(By.NAME,'password').send_keys(os.getenv("shopee_password"))
-      await asyncio.sleep(1)
+      browser.find_element(By.NAME,'password').send_keys(os.getenv("shopee_pwd"))
+      await asyncio.sleep(3)
       #點擊登入按鈕
       browser.find_element(By.CLASS_NAME,'wyhvVD._1EApiB.hq6WM5.L-VL8Q.cepDQ1._7w24N1').click()
-      await asyncio.sleep(3)
+      await asyncio.sleep(8)
       my_cookies = browser.get_cookies()
       with open(
           os.path.join(os.path.dirname((os.path.dirname(__file__))),
                       'cookies_shopee.json'),'w') as f:
         f.write(json.dumps(my_cookies)) 
-      await asyncio.sleep(3)
+      await asyncio.sleep(8)
       browser.get('https://shopee.tw/shopee-coins')
-      await asyncio.sleep(3)
+      await asyncio.sleep(8)
 
   #解析網頁原始碼
   soup = Soup(browser.page_source, "lxml")
 
-  await asyncio.sleep(4)
+  await asyncio.sleep(6)
   print("解析網頁原始碼完成")
 
   #獲取網頁所有的按鈕原始碼
