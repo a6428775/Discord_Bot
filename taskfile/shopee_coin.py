@@ -96,7 +96,7 @@ async def shopee_coin2(self):
   print("開始找尋簽到的按鈕")
   for btn in findBtn:
     #       找尋簽到的按鈕
-    if '今日簽到獲得' in btn.getText():
+    if '完成簽到' in btn.getText():
       #取得簽到按鈕的CLASS_NAME
       BTN_CLASS_NAME = btn.get("class")[0]
       #蝦皮簽到
