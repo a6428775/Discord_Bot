@@ -26,6 +26,10 @@ async def shopee_coin2(self):
   #options.add_argument('--headless')
   options.add_argument('--disable-dev-shm-usage')
   options.add_argument('--no-sandbox')
+  #反反爬蟲 去除 webdriver 特征
+  options.add_argument("--disable-blink-features")
+  options.add_argument("--disable-blink-features=AutomationControlled")
+
   #不顯示瀏覽器視窗
   browser = webdriver.Chrome(options=options)
 
