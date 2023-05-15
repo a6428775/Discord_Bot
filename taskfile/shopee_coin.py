@@ -106,7 +106,7 @@ async def shopee_coin2(self):
       #蝦皮簽到
       browser.find_element(By.CLASS_NAME, BTN_CLASS_NAME).click()
 
-      await self.channel.send('簽到成功 : ' + btn.getText())
+      await self.channel.send('簽到成功 : ' + btn.getText()[btn.getText().find('獲得'):])
 
       print("簽到成功")
       break
@@ -121,6 +121,6 @@ async def shopee_coin2(self):
       break
 
   #獲得目前蝦幣數量
-  findCoinCount = soup.find_all('a', href="/coins")[0].getText()
+  findCoinCount = browser.find_element(By.CLASS_NAME,'pcmall-dailycheckin_2ixaiI').text
   await self.channel.send('目前擁有蝦幣數量 : ' + findCoinCount)
   browser.quit()

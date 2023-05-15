@@ -19,7 +19,8 @@ from webdriver_manager.chrome import ChromeDriverManager
 # dt2 = dt1.astimezone(timezone(timedelta(hours=8))) # 轉換時區 -> 東八區
 #現在時間格式化
 #dt2.strftime("%H:%M:%S")
-
+with open(os.path.join(os.path.dirname((os.path.dirname(__file__))),'setting.json'),'r',encoding='utf8') as settingFile:
+  settingdata = json.load(settingFile)
 
 class Task(Cog_Extension):
 
@@ -54,9 +55,10 @@ class Task(Cog_Extension):
                   'r',
                   encoding='utf8') as jfile:
           jdata = json.load(jfile)
+
         #每日匯率
         if now_time in jdata['rate_time'] and self.counter == 0:
-          self.channel = self.bot.get_channel(1070285248585281566)
+          self.channel = self.bot.get_channel(int(settingdata["exchange_rate-channel"]))
           self.counter = 1
           await self.channel.send('今日匯率如下')
           try:
@@ -65,10 +67,10 @@ class Task(Cog_Extension):
             await self.channel.send('無法取得今日匯率,請維修')
           await asyncio.sleep(60)
           self.counter = 0
-        #蝦皮簽到
 
+        #蝦皮簽到
         if now_time in jdata['time'] and self.counter == 0:
-          self.channel = self.bot.get_channel(1070285440445333573)
+          self.channel = self.bot.get_channel(int(settingdata["shopee_coin-channel"]))
           self.counter = 1
           await self.channel.send('開始執行蝦皮自動簽到')
           # await sendpic(self,5)
