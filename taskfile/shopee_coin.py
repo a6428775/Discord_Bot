@@ -36,37 +36,42 @@ async def shopee_coin2(self):
   with open(os.path.join(os.path.dirname((os.path.dirname(__file__))),'setting.json'),'r',encoding='utf8') as settingFile:
     settingdata = json.load(settingFile)
   #根據設定檔選擇讀取cookies方式
-  if(settingdata["cookies_savetype"]=='1'):
-  #讀取存放cookies的json檔
+  if (settingdata["cookies_savetype"] == '1'):
+    #讀取存放cookies的json檔
     with open(
         os.path.join(os.path.dirname((os.path.dirname(__file__))),
-                    'cookies_shopee.json')) as f:
+                     'cookies_shopee.json')) as f:
       cookies = json.load(f)
-  elif(settingdata["cookies_savetype"]=='2'):
+  elif (settingdata["cookies_savetype"] == '2'):
+    channel = self.bot.get_channel(int(settingdata["shopee_cookies-channel"]))
     cookiesstr = ''
-    async for message in self.channel(int(settingdata["shopee_cookies-channel"])).history(limit=10,oldest_first =True):
-      cookiesstr=cookiesstr+message.content
+    async for message in channel.history(limit=10, oldest_first=True):
+      cookiesstr = cookiesstr + message.content
 
-    cookies = cookiesstr.replace('*','')
-    cookies = json.dumps(cookies)
+    cookies = cookiesstr.replace('*', '')
+    cookies = json.loads(cookies)
       
 
   #開啟蝦皮簽到網站網址
   browser.get('https://shopee.tw/shopee-coins')
   print("開啟蝦皮簽到網站網址")
   #載入cookie
-  for cookie in cookies:
-    #刪除cookies中sameSite部分 不然會報錯
-    try:
-      cookie.pop('sameSite')
-    except:
-      None
-    browser.add_cookie(cookie)
-  print("載入cookie")
-  #重新整理網頁
-  browser.refresh()
-  print("重新整理網頁完成")
-  await asyncio.sleep(8)
+  try:
+    for cookie in cookies:
+      #刪除cookies中sameSite部分 不然會報錯
+      try:
+        cookie.pop('sameSite')
+      except:
+        None
+      browser.add_cookie(cookie)
+    print("載入cookie")
+    #重新整理網頁
+    browser.refresh()
+    print("重新整理網頁完成")
+    await asyncio.sleep(8)
+  except:
+    print('cookies失效 改用帳密登入')
+    await self.channel.send('cookies失效 改用帳密登入')
 
   #判斷是否有登入成功 如cookies 登入失敗改用帳密登入並儲存新的cookies
   login = browser.find_element(
@@ -74,7 +79,7 @@ async def shopee_coin2(self):
     'pcmall-dailycheckin_3u8jig.pcmall-dailycheckin_3uUmyu.pcmall-dailycheckin_1EAaO5'
   )
   if login.text == '登入以獲得蝦幣':
-    print('cookies 已過期')
+
     browser.get(
       'https://shopee.tw/buyer/login?next=https%3A%2F%2Fshopee.tw%2Fshopee-coins'
     )
@@ -104,21 +109,21 @@ async def shopee_coin2(self):
                       'cookies_shopee.json'), 'w') as f:
         f.write(json.dumps(my_cookies))
     #儲存在 DC 私人頻道內 因有限制字數2000內 將cookies 分段儲存
-    elif(settingdata["cookies_savetype"]=='2'):
+    elif (settingdata["cookies_savetype"] == '2'):
+      channel = self.bot.get_channel(int(settingdata["shopee_cookies-channel"]))
 
       #先清空舊的cookies資訊
-      await self.channel(int(settingdata["shopee_cookies-channel"])).purge(limit=15)
+      await channel.purge(limit=15)
 
       my_cookies = json.dumps(my_cookies)
       my_cookies_length = len(str(my_cookies))
       #每1750字為一段
-      i=1750
-      j=0
-      for num in range(0,int(my_cookies_length/1750+1)):
-          # print('**'+str(my_cookies)[j:i]+'**')
-          await self.channel(int(settingdata["shopee_cookies-channel"])).send('**'+str(my_cookies)[j:i]+'**')
-          j=i
-          i=i+1750
+      i = 1750
+      j = 0
+      for num in range(0, int(my_cookies_length / 1750 + 1)):
+        await channel.send('**' + str(my_cookies)[j:i] + '**')
+        j = i
+        i = i + 1750
 
 
     #跳轉回蝦皮簽到頁面
@@ -163,5 +168,6 @@ async def shopee_coin2(self):
 
   #獲得目前蝦幣數量
   findCoinCount = browser.find_element(By.CLASS_NAME,'pcmall-dailycheckin_2ixaiI').text
+  await asyncio.sleep(3)
   await self.channel.send('目前擁有蝦幣數量 : ' + findCoinCount)
   browser.quit()
