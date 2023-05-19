@@ -32,12 +32,24 @@ async def shopee_coin2(self):
 
   #不顯示瀏覽器視窗
   browser = webdriver.Chrome(options=options)
-
+  #讀取設定json檔
+  with open(os.path.join(os.path.dirname((os.path.dirname(__file__))),'setting.json'),'r',encoding='utf8') as settingFile:
+    settingdata = json.load(settingFile)
+  #根據設定檔選擇讀取cookies方式
+  if(settingdata["cookies_savetype"]=='1'):
   #讀取存放cookies的json檔
-  with open(
-      os.path.join(os.path.dirname((os.path.dirname(__file__))),
-                   'cookies_shopee.json')) as f:
-    cookies = json.load(f)
+    with open(
+        os.path.join(os.path.dirname((os.path.dirname(__file__))),
+                    'cookies_shopee.json')) as f:
+      cookies = json.load(f)
+  elif(settingdata["cookies_savetype"]=='2'):
+    cookiesstr = ''
+    async for message in self.channel(int(settingdata["shopee_cookies-channel"])).history(limit=10,oldest_first =True):
+      cookiesstr=cookiesstr+message.content
+
+    cookies = cookiesstr.replace('*','')
+    cookies = json.dumps(cookies)
+      
 
   #開啟蝦皮簽到網站網址
   browser.get('https://shopee.tw/shopee-coins')
@@ -79,14 +91,43 @@ async def shopee_coin2(self):
     browser.find_element(
       By.CLASS_NAME, 'wyhvVD._1EApiB.hq6WM5.L-VL8Q.cepDQ1._7w24N1').click()
     await asyncio.sleep(8)
+
+    #獲取當前cookies資訊並儲存
     my_cookies = browser.get_cookies()
-    with open(
-        os.path.join(os.path.dirname((os.path.dirname(__file__))),
-                     'cookies_shopee.json'), 'w') as f:
-      f.write(json.dumps(my_cookies))
+
+    #根據設定檔選擇儲存cookies方式
+    #儲存在cookies_shopee.json檔 (私人儲存空間/伺服器)
+    if(settingdata["cookies_savetype"]=='1'):
+        
+      with open(
+          os.path.join(os.path.dirname((os.path.dirname(__file__))),
+                      'cookies_shopee.json'), 'w') as f:
+        f.write(json.dumps(my_cookies))
+    #儲存在 DC 私人頻道內 因有限制字數2000內 將cookies 分段儲存
+    elif(settingdata["cookies_savetype"]=='2'):
+
+      #先清空舊的cookies資訊
+      await self.channel(int(settingdata["shopee_cookies-channel"])).purge(limit=15)
+
+      my_cookies = json.dumps(my_cookies)
+      my_cookies_length = len(str(my_cookies))
+      #每1750字為一段
+      i=1750
+      j=0
+      for num in range(0,int(my_cookies_length/1750+1)):
+          # print('**'+str(my_cookies)[j:i]+'**')
+          await self.channel(int(settingdata["shopee_cookies-channel"])).send('**'+str(my_cookies)[j:i]+'**')
+          j=i
+          i=i+1750
+
+
+    #跳轉回蝦皮簽到頁面
     await asyncio.sleep(8)
     browser.get('https://shopee.tw/shopee-coins')
     await asyncio.sleep(8)
+
+
+    
 
   #解析網頁原始碼
   soup = Soup(browser.page_source, "lxml")
